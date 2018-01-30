@@ -1,0 +1,203 @@
+<html>
+    <head>
+    
+    <title>Game</title>
+        <style>
+            #mycanvas {
+                border: 5px solid red;
+                background-image: url(bk.png);
+                background-size: cover
+            }
+        </style>
+    
+    </head>
+    <body>
+        <canvas id="myCanvas" width="800" height="600"></canvas>
+<script>
+             
+    var score = 0;
+    function isColliding(r1,r2){
+        return Math.abs(r1.x-r2.x) < r1.w-15 && Math.abs(r1.y-r2.y) < r1.h-15;
+    }
+    function loadImages(){
+        goalImage = new Image();
+        goalImage.src = "./poke.png";
+        
+        playerImage = new Image();
+        playerImage.src = "./pika.png";
+        
+        enemey1Image = new Image();
+        enemey1Image.src = "./char.png";
+        
+        enemey2Image = new Image();
+        enemey2Image.src = "./blas.png";
+        
+        enemey3Image = new Image();
+        enemey3Image.src = "./saur.png";
+    }
+    loadImages();
+    
+    function init(){
+        
+        console.log('in init');
+        //get the canvas from html
+        canvas = document.getElementById('myCanvas');
+        //canvas comes with a pen which helps us to draw things
+        pen = canvas.getContext('2d');
+        //2d means that pen is capable of drawing in 2d
+        //eraser is also there
+        
+        W = canvas.width;
+        H = canvas.height;
+        
+        //define enemey
+        
+        enemey1 = {
+            x : 150,
+            y : 150,
+            w: 75,
+            h : 75,
+            speedY : 10
+        }
+        enemey2 = {
+            x : 350,
+            y : 0,
+            w : 75,
+            h : 75,
+            speedY : 6
+        }
+        enemey3 = {
+            x : 550,
+            y : 300,
+            w : 75,
+            h : 75,
+            speedY : 12
+        }
+        
+        enemies = [enemey1,enemey2,enemey3];
+        
+        player = {
+            
+            x : 0,
+            y : H/2,
+            w : 75,
+            h : 75,
+            speedX : 0,
+            move : function(speed){
+                this.speedX = speed;
+            }
+        }
+        goal = {
+            x : W - 75,
+            y : H/2,
+            w : 75,
+            h : 75
+        }
+        GAME_OVER = false;
+        function moveplayer(){
+            player.move(10);
+            
+        }
+        function stopPlayer(){
+            player.move(0);
+        }
+        
+        document.addEventListener('mousedown',moveplayer);
+        document.addEventListener('mouseup',stopPlayer);
+    
+    }
+
+    function update(){
+        console.log("in update");
+        
+        
+        //update the player
+        
+        player.x =player.x + player.speedX;
+        
+        
+        enemies.forEach(function(enemey){
+        
+        if(enemey.y>H - enemey.h||enemey.y<0) enemey.speedY*=-1;
+        
+         enemey.y=enemey.y + enemey.speedY;
+        
+//        if(enemey2.y>H - enemey2.h||enemey2.y<0) enemey2.speedY*=-1;
+//    
+//        
+//         enemey2.y=enemey2.y + enemey2.speedY;
+//        if(enemey3.y>H - enemey3.h||enemey3.y<0) enemey3.speedY*=-1;
+//    
+//        
+//         enemey3.y=enemey3.y + enemey3.speedY;
+        
+        
+        if(isColliding(player,enemey) || isColliding(player,goal)) GAME_OVER = true;
+        
+            
+        score = Math.round(player.x/10)
+            
+        
+    
+            
+        });
+        
+        
+    }
+
+    function draw(){
+        console.log("in draw");
+//        pen.fillStyle = "red";
+//        pen.fillRect(120,120,100,100);
+        
+        
+        pen.clearRect(0,0,W,H);
+        
+        enemies.forEach(function(enemey){
+            pen.drawImage(eval("enemey" + (enemies.indexOf(enemey) + 1) + "Image"),enemey.x,enemey.y,enemey.w,enemey.h);
+            
+        })
+
+        pen.drawImage(playerImage,player.x,player.y,player.w,player.h);
+        pen.drawImage(goalImage,goal.x,goal.y,goal.w,goal.h);
+//        pen.drawImage(enemey2Image,enemey2.x,enemey2.y,enemey2.w,enemey2.h);
+//        pen.drawImage(enemey3Image,enemey3.x,enemey3.y,enemey3.w,enemey3.h);
+
+        
+        //last parameter is the opacity and this is the rgb form notation of colour
+        
+        //draw enemey
+//        pen.drawImage(enemey1Image,enemey1.x,enemey1.y,enemey1.w,enemey1.h);
+        
+        pen.font = "20px Aerial";
+        pen.fillStyle = "white";
+        pen.fillText("Score : " + score,20,20);
+    
+    }   
+    function gameLoop(){
+        console.log('in gameLoop');
+        draw();
+        update();
+        if(!GAME_OVER)
+        window.requestAnimationFrame(gameLoop);
+        
+        else{
+            var choice = prompt("do you want to play again.?")
+            if(choice==="y")
+                start();
+            else
+                window.alert("thankyou for playing");
+        }
+        //this gives max frame rate possible 
+    }
+    function start(){
+        init();
+        gameLoop();
+    }
+    start();
+        //        window.setTimeout(gameLoop,30);
+        //        this is the fps             ^
+        
+</script>
+    </body>
+</html>
